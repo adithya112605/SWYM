@@ -1,5 +1,7 @@
 node_modules/
 dist/
+.next/
+.wrangler/
 SWYM/
 *.log
 .DS_Store

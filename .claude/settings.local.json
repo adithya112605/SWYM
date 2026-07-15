@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -C /c/Users/adith/Desktop/SWYM log --oneline -10)"
+      "Bash(git -C /c/Users/adith/Desktop/SWYM log --oneline -10)",
+      "Bash(python -m http.server 5500)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5500/)",
+      "Bash(start *)"
     ]
   }
 }
