@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /c/Users/adith/Desktop/SWYM log --oneline -10)"
+    ]
+  }
+}

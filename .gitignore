@@ -1,0 +1,5 @@
+node_modules/
+dist/
+SWYM/
+*.log
+.DS_Store
