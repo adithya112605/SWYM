@@ -35,4 +35,4 @@ Schema and reference queries live in [`sql/schema.sql`](sql/schema.sql) and [`sq
 
 ## GitHub Pages
 
-The included workflow builds `dist/` and deploys it through GitHub Pages. In the repository settings, set **Pages → Source** to **GitHub Actions**, then push the default branch.
+The included workflow builds the static `pages-dist/` artifact and deploys it through GitHub Pages. In the repository settings, set **Pages → Source** to **GitHub Actions**. The deployment runs automatically on pushes to `main` or `master`.
