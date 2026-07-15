@@ -292,7 +292,7 @@ export default function App() {
   };
 
   return <>
-    <AnimatePresence>{!ready && <motion.div className="loading-screen" exit={{ opacity: 0 }}><motion.div className="loading-mark" animate={{ rotate: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.2 }}>TL</motion.div><p>Preparing the collection…</p></motion.div>}</AnimatePresence>
+    <span className="sr-only" role="status" aria-live="polite">{ready ? "Collection ready" : "Preparing the collection"}</span>
     <Navbar totalItems={snapshot.totalItems} onOpenWishlist={() => setDrawerOpen(true)} />
     <main id="top"><Hero /><Collection products={snapshot.products} onAdd={handleAdd} /><Story /></main>
     <footer><a className="brand footer-brand" href="#top"><span className="brand-mark">TL</span><span>THREADLINE</span></a><p>A small wardrobe, full of possibility.</p><span>© 2026 Threadline</span></footer>

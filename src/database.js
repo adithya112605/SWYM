@@ -10,6 +10,7 @@ const SESSION_KEY = "threadline-session-id";
 let SQL;
 let db;
 let initPromise;
+let storageAvailable = true;
 const listeners = new Set();
 
 const styles = [
@@ -86,14 +87,15 @@ function getSessionId() {
 
 function openIndexedDb() {
   return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error("Browser storage timed out.")), 2500);
     const request = indexedDB.open(DB_NAME, 1);
     request.onupgradeneeded = () => {
       if (!request.result.objectStoreNames.contains(DB_STORE)) {
         request.result.createObjectStore(DB_STORE);
       }
     };
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
+    request.onsuccess = () => { clearTimeout(timeout); resolve(request.result); };
+    request.onerror = () => { clearTimeout(timeout); reject(request.error); };
   });
 }
 
@@ -109,6 +111,7 @@ async function readPersistedDb() {
 }
 
 async function persistDb(bytes = db.export()) {
+  if (!storageAvailable) return;
   const connection = await openIndexedDb();
   return new Promise((resolve, reject) => {
     const tx = connection.transaction(DB_STORE, "readwrite");
@@ -159,7 +162,14 @@ function seedProducts() {
 
 async function initialize() {
   SQL = await initSqlJs({ locateFile: () => sqlWasmUrl });
-  const saved = await readPersistedDb();
+  let saved = null;
+  try {
+    saved = await readPersistedDb();
+  } catch {
+    // Privacy modes and automated renderers can disable IndexedDB. The app
+    // remains fully usable with an in-memory SQLite database for that visit.
+    storageAvailable = false;
+  }
   db = saved ? new SQL.Database(saved) : new SQL.Database();
   db.run("PRAGMA foreign_keys = ON");
   if (!saved) {
