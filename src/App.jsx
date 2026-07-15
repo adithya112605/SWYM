@@ -128,13 +128,14 @@ function ProductCard({ style, onAdd }) {
   const sizes = [...new Set(style.variants.map((v) => v.size))];
   const [color, setColor] = useState(colors[0][0]);
   const [size, setSize] = useState(sizes[0]);
+  const [altLoaded, setAltLoaded] = useState(false);
   const variant = style.variants.find((v) => v.color === color && v.size === size) || style.variants[0];
 
   return (
-    <motion.article className="product-card" layout variants={reveal} whileHover={{ y: -5 }}>
+    <motion.article className={`product-card ${altLoaded ? "has-alt-image" : ""}`} layout variants={reveal} whileHover={{ y: -5 }}>
       <div className="product-image">
         <motion.img className="product-image-primary" src={style.image_url} alt={style.name} loading="lazy" transition={{ duration: .55, ease }} />
-        <img className="product-image-alt" src={alternateProductImages[style.style_code]} alt={`${style.name} styled editorial view`} loading="lazy" />
+        <img className="product-image-alt" src={alternateProductImages[style.style_code]} alt={`${style.name} styled editorial view`} loading="lazy" onLoad={() => setAltLoaded(true)} onError={(event) => { setAltLoaded(false); event.currentTarget.hidden = true; }} />
         <span className="category-tag">{style.category}</span>
         <motion.button className="quick-heart" aria-label={`Save ${style.name}`} onClick={() => onAdd(variant)} whileTap={{ scale: .82 }}><Heart size={18} /></motion.button>
       </div>
