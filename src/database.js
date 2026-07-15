@@ -20,7 +20,7 @@ const styles = [
     description: "A relaxed layer cut from washed European linen.",
     category: "Shirts",
     price: 12800,
-    image: "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?auto=format&fit=crop&w=900&q=85",
+    image: "./images/threadline-editorial.png",
     colors: [["Oat", "#d7ccb4"], ["Olive", "#626a50"], ["Ink", "#292c2d"]],
     sizes: ["S", "M", "L", "XL"],
   },
@@ -30,7 +30,7 @@ const styles = [
     description: "A substantial organic cotton tee with a clean drape.",
     category: "T-Shirts",
     price: 5800,
-    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=85",
+    image: "./images/threadline-editorial.png",
     colors: [["Chalk", "#ece9df"], ["Rust", "#a94f36"], ["Black", "#242424"]],
     sizes: ["XS", "S", "M", "L", "XL"],
   },
@@ -40,7 +40,7 @@ const styles = [
     description: "Fluid tailoring with a softly tapered, full-length leg.",
     category: "Trousers",
     price: 11800,
-    image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?auto=format&fit=crop&w=900&q=85",
+    image: "./images/threadline-editorial.png",
     colors: [["Stone", "#b7ab96"], ["Espresso", "#4a392e"], ["Navy", "#343b4b"]],
     sizes: ["XS", "S", "M", "L"],
   },
@@ -50,7 +50,7 @@ const styles = [
     description: "A breathable cotton knit with a neat open collar.",
     category: "Knitwear",
     price: 9400,
-    image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?auto=format&fit=crop&w=900&q=85",
+    image: "./images/threadline-editorial.png",
     colors: [["Cream", "#e7dfce"], ["Moss", "#7c8268"], ["Terracotta", "#b66044"]],
     sizes: ["S", "M", "L", "XL"],
   },
@@ -60,7 +60,7 @@ const styles = [
     description: "An effortless column silhouette in crisp cotton poplin.",
     category: "Dresses",
     price: 14200,
-    image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=900&q=85",
+    image: "./images/threadline-editorial.png",
     colors: [["Paprika", "#a84430"], ["Midnight", "#252b38"], ["Sand", "#cbbda4"]],
     sizes: ["XS", "S", "M", "L"],
   },
@@ -70,7 +70,7 @@ const styles = [
     description: "A boxy four-pocket jacket softened by garment washing.",
     category: "Outerwear",
     price: 16800,
-    image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=900&q=85",
+    image: "./images/threadline-editorial.png",
     colors: [["Khaki", "#a39273"], ["Forest", "#3f5145"], ["Clay", "#9b604c"]],
     sizes: ["S", "M", "L", "XL"],
   },
@@ -333,7 +333,8 @@ export async function mergeWishlists(sourceId, targetId) {
 export function getSnapshot() {
   if (!db) return { products: [], wishlists: [], totalItems: 0 };
   const owner = getSessionId();
-  const products = rows("SELECT * FROM products WHERE is_active = 1 ORDER BY category, style_code, color, size");
+  const products = rows("SELECT * FROM products WHERE is_active = 1 ORDER BY category, style_code, color, size")
+    .map((product) => ({ ...product, image_url: "./images/threadline-editorial.png" }));
   const lists = rows(
     `SELECT w.*,
       COUNT(wi.product_id) AS sku_count,
@@ -350,7 +351,7 @@ export function getSnapshot() {
        FROM wishlist_items wi JOIN products p ON p.id = wi.product_id
        WHERE wi.wishlist_id = ? ORDER BY wi.updated_at DESC`,
       [list.id],
-    ),
+    ).map((item) => ({ ...item, image_url: "./images/threadline-editorial.png" })),
   }));
   return {
     products,

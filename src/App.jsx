@@ -102,9 +102,9 @@ function Hero() {
         </motion.div>
       </motion.div>
       <motion.div className="hero-art" initial={{ clipPath: "inset(0 0 100% 0)" }} animate={{ clipPath: "inset(0 0 0% 0)" }} transition={{ duration: 1.15, delay: .15, ease }}>
-        <motion.img style={{ y: imageY, scale: 1.12 }} src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1600&q=90" alt="Editorial model wearing a modern neutral outfit" />
+        <motion.img style={{ y: imageY, scale: 1.12, objectPosition: "62% center" }} src="./images/threadline-editorial.png" alt="Threadline editorial campaign featuring modern neutral clothing" />
         <motion.div className="hero-secondary" initial={{ opacity: 0, x: 35, rotate: 3 }} animate={{ opacity: 1, x: 0, rotate: 0 }} transition={{ delay: 1.05, duration: .75, ease }}>
-          <img src="https://images.unsplash.com/photo-1496217590455-aa63a8350eea?auto=format&fit=crop&w=600&q=88" alt="Close detail of premium fashion styling" />
+          <img src="./images/threadline-editorial.png" style={{ objectPosition: "86% center" }} alt="Close detail of premium Threadline styling" />
           <span>THE LINEN STUDY</span>
         </motion.div>
         <motion.span className="hero-note" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 }}>Made for repeat wear</motion.span>
@@ -115,12 +115,21 @@ function Hero() {
 }
 
 const alternateProductImages = {
-  "linen-overshirt": "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=88",
-  "soft-structure-tee": "https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=900&q=88",
-  "pleated-trouser": "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=900&q=88",
-  "knit-polo": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=900&q=88",
-  "studio-dress": "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=900&q=88",
-  "utility-jacket": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=88",
+  "linen-overshirt": "./images/threadline-editorial.png",
+  "soft-structure-tee": "./images/threadline-editorial.png",
+  "pleated-trouser": "./images/threadline-editorial.png",
+  "knit-polo": "./images/threadline-editorial.png",
+  "studio-dress": "./images/threadline-editorial.png",
+  "utility-jacket": "./images/threadline-editorial.png",
+};
+
+const productImagePositions = {
+  "linen-overshirt": "66% center",
+  "soft-structure-tee": "76% center",
+  "pleated-trouser": "64% 70%",
+  "knit-polo": "83% 68%",
+  "studio-dress": "89% center",
+  "utility-jacket": "68% 38%",
 };
 
 function ProductCard({ style, onAdd }) {
@@ -134,8 +143,8 @@ function ProductCard({ style, onAdd }) {
   return (
     <motion.article className={`product-card ${altLoaded ? "has-alt-image" : ""}`} layout variants={reveal} whileHover={{ y: -5 }}>
       <div className="product-image">
-        <motion.img className="product-image-primary" src={style.image_url} alt={style.name} loading="lazy" transition={{ duration: .55, ease }} />
-        <img className="product-image-alt" src={alternateProductImages[style.style_code]} alt={`${style.name} styled editorial view`} loading="lazy" onLoad={() => setAltLoaded(true)} onError={(event) => { setAltLoaded(false); event.currentTarget.hidden = true; }} />
+        <motion.img className="product-image-primary" src="./images/threadline-editorial.png" style={{ objectPosition: productImagePositions[style.style_code] }} alt={style.name} loading="lazy" transition={{ duration: .55, ease }} />
+        <img className="product-image-alt" src={alternateProductImages[style.style_code]} style={{ objectPosition: productImagePositions[style.style_code] }} alt={`${style.name} styled editorial view`} loading="lazy" onLoad={() => setAltLoaded(true)} onError={(event) => { setAltLoaded(false); event.currentTarget.hidden = true; }} />
         <span className="category-tag">{style.category}</span>
         <motion.button className="quick-heart" aria-label={`Save ${style.name}`} onClick={() => onAdd(variant)} whileTap={{ scale: .82 }}><Heart size={18} /></motion.button>
       </div>
