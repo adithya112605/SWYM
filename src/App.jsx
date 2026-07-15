@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, MotionConfig, motion, useMotionValueEvent, useScroll, useTransform } from "framer-motion";
 import {
-  ArrowDownRight, Check, ChevronDown, Heart, Menu, Merge, Minus,
-  Plus, ShoppingBag, Sparkles, Trash2, X,
+  ArrowDownRight, Check, ChevronDown, Heart, Menu, Merge, Minus, Moon,
+  Plus, Settings, Sparkles, Sun, Trash2, X,
 } from "lucide-react";
 import {
   addWishlistItem, createWishlist, getSnapshot, initStore, mergeWishlists,
@@ -21,7 +21,7 @@ function formatPrice(cents, currency = "USD") {
   return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(cents / 100);
 }
 
-function Navbar({ totalItems, onOpenWishlist }) {
+function Navbar({ totalItems, onOpenWishlist, theme, onToggleTheme, onOpenSettings }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { scrollY } = useScroll();
@@ -30,13 +30,16 @@ function Navbar({ totalItems, onOpenWishlist }) {
   const links = [["New in", "#collection"], ["Essentials", "#collection"], ["Our story", "#story"]];
   return (
     <>
+      <motion.div className="announcement-bar" initial={{ y: -30 }} animate={{ y: 0 }} transition={{ duration: .65, ease }}>
+        <span>Complimentary shipping on orders over $150</span><span className="announcement-center">A wardrobe with intention</span><span>Summer edit · 2026</span>
+      </motion.div>
       <motion.header
         className={`site-header ${scrolled ? "scrolled" : ""}`}
         initial={{ y: -90 }} animate={{ y: 0 }} transition={{ duration: 0.75, ease }}
       >
         <a className="brand" href="#top" aria-label="Threadline home">
-          <motion.span className="brand-mark" whileHover={{ rotate: 12, scale: 1.06 }}>TL</motion.span>
-          <span>THREADLINE</span>
+          <motion.span className="brand-mark" whileHover={{ rotate: 12, scale: 1.06 }}><i>T</i><b>L</b></motion.span>
+          <span className="brand-word"><strong>THREADLINE</strong><small>MODERN ESSENTIALS</small></span>
         </a>
         <nav aria-label="Primary navigation">
           {links.map(([label, href]) => (
@@ -44,6 +47,10 @@ function Navbar({ totalItems, onOpenWishlist }) {
           ))}
         </nav>
         <div className="nav-actions">
+          <motion.button className="nav-icon-button" onClick={onToggleTheme} whileTap={{ rotate: 18, scale: .9 }} aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}>
+            <AnimatePresence mode="wait" initial={false}>{theme === "light" ? <motion.span key="moon" initial={{ rotate: -40, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 40, opacity: 0 }}><Moon size={17} /></motion.span> : <motion.span key="sun" initial={{ rotate: -40, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 40, opacity: 0 }}><Sun size={17} /></motion.span>}</AnimatePresence>
+          </motion.button>
+          <motion.button className="nav-icon-button settings-trigger" onClick={onOpenSettings} whileHover={{ rotate: 25 }} whileTap={{ scale: .9 }} aria-label="Open display settings"><Settings size={17} /></motion.button>
           <motion.button
             className="wishlist-trigger" type="button" onClick={onOpenWishlist}
             whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
@@ -95,13 +102,26 @@ function Hero() {
         </motion.div>
       </motion.div>
       <motion.div className="hero-art" initial={{ clipPath: "inset(0 0 100% 0)" }} animate={{ clipPath: "inset(0 0 0% 0)" }} transition={{ duration: 1.15, delay: .15, ease }}>
-        <motion.img style={{ y: imageY, scale: 1.12 }} src="https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1400&q=85" alt="Curated neutral clothing collection on a rail" />
+        <motion.img style={{ y: imageY, scale: 1.12 }} src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1600&q=90" alt="Editorial model wearing a modern neutral outfit" />
+        <motion.div className="hero-secondary" initial={{ opacity: 0, x: 35, rotate: 3 }} animate={{ opacity: 1, x: 0, rotate: 0 }} transition={{ delay: 1.05, duration: .75, ease }}>
+          <img src="https://images.unsplash.com/photo-1496217590455-aa63a8350eea?auto=format&fit=crop&w=600&q=88" alt="Close detail of premium fashion styling" />
+          <span>THE LINEN STUDY</span>
+        </motion.div>
         <motion.span className="hero-note" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1 }}>Made for repeat wear</motion.span>
         <div className="hero-index">01 <span /> 06</div>
       </motion.div>
     </section>
   );
 }
+
+const alternateProductImages = {
+  "linen-overshirt": "https://images.unsplash.com/photo-1603252109303-2751441dd157?auto=format&fit=crop&w=900&q=88",
+  "soft-structure-tee": "https://images.unsplash.com/photo-1503341504253-dff4815485f1?auto=format&fit=crop&w=900&q=88",
+  "pleated-trouser": "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?auto=format&fit=crop&w=900&q=88",
+  "knit-polo": "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&w=900&q=88",
+  "studio-dress": "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=900&q=88",
+  "utility-jacket": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=88",
+};
 
 function ProductCard({ style, onAdd }) {
   const colors = [...new Map(style.variants.map((v) => [v.color, v.color_hex])).entries()];
@@ -113,7 +133,8 @@ function ProductCard({ style, onAdd }) {
   return (
     <motion.article className="product-card" layout variants={reveal} whileHover={{ y: -5 }}>
       <div className="product-image">
-        <motion.img src={style.image_url} alt={style.name} loading="lazy" whileHover={{ scale: 1.045 }} transition={{ duration: .55, ease }} />
+        <motion.img className="product-image-primary" src={style.image_url} alt={style.name} loading="lazy" transition={{ duration: .55, ease }} />
+        <img className="product-image-alt" src={alternateProductImages[style.style_code]} alt={`${style.name} styled editorial view`} loading="lazy" />
         <span className="category-tag">{style.category}</span>
         <motion.button className="quick-heart" aria-label={`Save ${style.name}`} onClick={() => onAdd(variant)} whileTap={{ scale: .82 }}><Heart size={18} /></motion.button>
       </div>
@@ -247,6 +268,14 @@ function MergeModal({ wishlists, onClose, onSubmit }) {
   return <Modal onClose={onClose}><p className="eyebrow">COMBINE YOUR EDITS</p><h2>Merge wishlists</h2><p className="dialog-copy">Matching size and color variants are combined automatically, with their quantities added together.</p><form onSubmit={(e) => { e.preventDefault(); onSubmit(source, target); }}><label className="field-label">Move everything from</label><select value={source} onChange={(e) => setSource(e.target.value)}>{wishlists.map((list) => <option key={list.id} value={list.id}>{list.name} · {list.item_count} items</option>)}</select><div className="merge-arrow">↓</div><label className="field-label">Into</label><select value={target} onChange={(e) => setTarget(e.target.value)}>{targets.map((list) => <option key={list.id} value={list.id}>{list.name} · {list.item_count} items</option>)}</select><p className="warning-note">The source list will be deleted only after the merge succeeds.</p><div className="dialog-actions"><button className="secondary-button" type="button" onClick={onClose}>Cancel</button><button className="primary-button" type="submit"><Merge size={15} /> Merge lists</button></div></form></Modal>;
 }
 
+function SettingsModal({ theme, setTheme, motionEnabled, setMotionEnabled, onClose }) {
+  return <Modal onClose={onClose}><p className="eyebrow">MAKE IT YOURS</p><h2>Display settings</h2><p className="dialog-copy">Tune Threadline to the way you like to browse.</p>
+    <div className="setting-row"><div><strong>Appearance</strong><span>Choose your preferred palette</span></div><div className="theme-segment"><button className={theme === "light" ? "active" : ""} onClick={() => setTheme("light")}><Sun size={15} /> Light</button><button className={theme === "dark" ? "active" : ""} onClick={() => setTheme("dark")}><Moon size={15} /> Dark</button></div></div>
+    <div className="setting-row"><div><strong>Motion</strong><span>Editorial reveals and transitions</span></div><button className={`switch ${motionEnabled ? "active" : ""}`} onClick={() => setMotionEnabled(!motionEnabled)} role="switch" aria-checked={motionEnabled}><span /></button></div>
+    <button className="primary-button settings-done" onClick={onClose}>Save preferences</button>
+  </Modal>;
+}
+
 function Story() {
   return <section className="story" id="story"><motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: .25 }} variants={{ visible: { transition: { staggerChildren: .12 } } }}><motion.p className="eyebrow" variants={reveal}>OUR APPROACH</motion.p><motion.blockquote variants={reveal}>“Fewer, better pieces. Clothes that feel like you from the first wear.”</motion.blockquote><motion.div className="story-points" variants={reveal}><span>01 / Thoughtful materials</span><span>02 / Enduring silhouettes</span><span>03 / Small-batch production</span></motion.div></motion.div></section>;
 }
@@ -258,6 +287,8 @@ export default function App() {
   const [modal, setModal] = useState(null);
   const [activeListId, setActiveListId] = useState(null);
   const [toasts, setToasts] = useState([]);
+  const [theme, setTheme] = useState("light");
+  const [motionEnabled, setMotionEnabled] = useState(true);
 
   const toast = (message, type = "success") => {
     const id = crypto.randomUUID(); setToasts((items) => [...items, { id, message, type }]);
@@ -275,6 +306,19 @@ export default function App() {
     return () => { mounted = false; unsubscribe(); };
   }, []);
   useEffect(() => {
+    try {
+      const savedTheme = localStorage.getItem("threadline-theme");
+      const preferred = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      setTheme(savedTheme || preferred);
+      setMotionEnabled(localStorage.getItem("threadline-motion") !== "off");
+    } catch { /* preferences are optional */ }
+  }, []);
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.dataset.motion = motionEnabled ? "full" : "reduced";
+    try { localStorage.setItem("threadline-theme", theme); localStorage.setItem("threadline-motion", motionEnabled ? "on" : "off"); } catch { /* optional */ }
+  }, [theme, motionEnabled]);
+  useEffect(() => {
     if (activeListId && !snapshot.wishlists.some((list) => list.id === activeListId)) setActiveListId(snapshot.wishlists[0]?.id || null);
   }, [snapshot.wishlists, activeListId]);
 
@@ -291,13 +335,14 @@ export default function App() {
     if (result) { setActiveListId(target); setModal(null); }
   };
 
-  return <>
+  return <MotionConfig reducedMotion={motionEnabled ? "never" : "always"}><>
     <span className="sr-only" role="status" aria-live="polite">{ready ? "Collection ready" : "Preparing the collection"}</span>
-    <Navbar totalItems={snapshot.totalItems} onOpenWishlist={() => setDrawerOpen(true)} />
+    <Navbar totalItems={snapshot.totalItems} onOpenWishlist={() => setDrawerOpen(true)} theme={theme} onToggleTheme={() => setTheme(theme === "light" ? "dark" : "light")} onOpenSettings={() => setModal("settings")} />
     <main id="top"><Hero /><Collection products={snapshot.products} onAdd={handleAdd} /><Story /></main>
     <footer><a className="brand footer-brand" href="#top"><span className="brand-mark">TL</span><span>THREADLINE</span></a><p>A small wardrobe, full of possibility.</p><span>© 2026 Threadline</span></footer>
     <WishlistDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} wishlists={snapshot.wishlists} activeId={activeListId} setActiveId={setActiveListId} onCreate={() => setModal("create")} onMerge={() => setModal("merge")} onQuantity={(listId, item, qty) => perform(() => setWishlistItemQuantity(listId, item.id, qty), qty > 0 ? "Quantity updated" : "Item removed")} onRemove={(listId, item) => perform(() => removeWishlistItem(listId, item.id), `${item.name} removed`)} />
     <AnimatePresence>{modal === "create" && <CreateModal onClose={() => setModal(null)} onSubmit={handleCreate} />}{modal === "merge" && <MergeModal wishlists={snapshot.wishlists} onClose={() => setModal(null)} onSubmit={handleMerge} />}</AnimatePresence>
+    <AnimatePresence>{modal === "settings" && <SettingsModal theme={theme} setTheme={setTheme} motionEnabled={motionEnabled} setMotionEnabled={setMotionEnabled} onClose={() => setModal(null)} />}</AnimatePresence>
     <div className="toast-region" aria-live="polite"><AnimatePresence>{toasts.map((item) => <motion.div className={`toast ${item.type}`} key={item.id} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 30 }}><Check size={15} />{item.message}</motion.div>)}</AnimatePresence></div>
-  </>;
+  </></MotionConfig>;
 }
